@@ -370,6 +370,55 @@ def _hierarchical_cluster_embeddings(embeddings: List[List[float]]) -> List[int]
     except Exception:
         return [-1] * len(embeddings)
 
+def _hdbscan_cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
+    """
+    HDBSCAN opcional usando sklearn.cluster.HDBSCAN cuando está disponible.
+
+    No se vuelve obligatorio porque en algunos entornos puede variar la versión de sklearn.
+    Si falla, devuelve todo como ruido y el pipeline cae a DBSCAN.
+    """
+    if len(embeddings) < 2:
+        return [-1] * len(embeddings)
+
+    try:
+        import numpy as np
+        from sklearn.cluster import HDBSCAN
+
+        x_matrix = np.asarray(embeddings, dtype=float)
+
+        model = HDBSCAN(
+            min_cluster_size=FAQ_HDBSCAN_MIN_CLUSTER_SIZE,
+            min_samples=FAQ_HDBSCAN_MIN_SAMPLES,
+            metric="euclidean",
+        )
+
+        raw_labels = [int(label) for label in model.fit_predict(x_matrix)]
+
+        counts = Counter(label for label in raw_labels if label != -1)
+        if not counts:
+            return [-1] * len(embeddings)
+
+        remap: Dict[int, int] = {}
+        next_label = 0
+        labels: List[int] = []
+
+        for label in raw_labels:
+            if label == -1:
+                labels.append(-1)
+                continue
+
+            if label not in remap:
+                remap[label] = next_label
+                next_label += 1
+
+            labels.append(remap[label])
+
+        return labels
+
+    except Exception as exc:
+        print(f"HDBSCAN no disponible o fallo durante clustering. Se usara DBSCAN. Error: {exc}")
+        return [-1] * len(embeddings)
+
 def cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
     """
     Clustering adaptativo.
@@ -380,6 +429,17 @@ def cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
     """
     if not embeddings:
         return []
+    
+    if FAQ_CLUSTER_ALGORITHM in {"hdbscan", "auto"}:
+        hdbscan_labels = _hdbscan_cluster_embeddings(embeddings)
+        hdbscan_cluster_count = len({label for label in hdbscan_labels if label != -1})
+
+    if FAQ_CLUSTER_ALGORITHM == "hdbscan":
+        return hdbscan_labels
+
+    if hdbscan_cluster_count >= 2:
+        print(f"HDBSCAN activo: clusters detectados={hdbscan_cluster_count}")
+        return hdbscan_labels    
 
     def run_dbscan(eps_value: float) -> List[int]:
         try:
@@ -2879,7 +2939,9 @@ def build_company_candidates(
             previous_candidate_semantic_duplicate = True
             stats["duplicates_against_previous_candidates"] += 1
             stats["candidates_superseded"] += 1
-            print(f"Candidato similar a candidato previo; se persiste en el run actual para mantener visibilidad: {question_text}")
+            stats["candidates_skipped_existing"] += 1
+            print(f"Candidato omitido por similitud con candidato previo validado/rechazado: {question_text}")
+            continue
 
         created_dates = [
             parsed_date

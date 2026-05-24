@@ -374,19 +374,24 @@ def _hdbscan_cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
     """
     HDBSCAN opcional usando sklearn.cluster.HDBSCAN cuando está disponible.
 
-    No se vuelve obligatorio porque en algunos entornos puede variar la versión de sklearn.
-    Si falla, devuelve todo como ruido y el pipeline cae a DBSCAN.
+    Se importa dinámicamente para evitar falsos positivos de Pylance en entornos
+    donde sklearn sí lo trae en runtime, pero los stubs no lo exponen bien.
     """
     if len(embeddings) < 2:
         return [-1] * len(embeddings)
 
     try:
         import numpy as np
-        from sklearn.cluster import HDBSCAN
+        import sklearn.cluster as sklearn_cluster
+
+        hdbscan_cls = getattr(sklearn_cluster, "HDBSCAN", None)
+        if hdbscan_cls is None:
+            print("HDBSCAN no está disponible en esta versión de scikit-learn. Se usará DBSCAN.")
+            return [-1] * len(embeddings)
 
         x_matrix = np.asarray(embeddings, dtype=float)
 
-        model = HDBSCAN(
+        model = hdbscan_cls(
             min_cluster_size=FAQ_HDBSCAN_MIN_CLUSTER_SIZE,
             min_samples=FAQ_HDBSCAN_MIN_SAMPLES,
             metric="euclidean",
@@ -416,7 +421,7 @@ def _hdbscan_cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
         return labels
 
     except Exception as exc:
-        print(f"HDBSCAN no disponible o fallo durante clustering. Se usara DBSCAN. Error: {exc}")
+        print(f"HDBSCAN no disponible o falló durante clustering. Se usará DBSCAN. Error: {exc}")
         return [-1] * len(embeddings)
 
 def cluster_embeddings(embeddings: List[List[float]]) -> List[int]:
@@ -1402,71 +1407,183 @@ def strip_thinking_text(raw_text: str) -> str:
 
 
 def is_good_faq_candidate(text: str, mode: Optional[str] = None) -> bool:
-    text = normalize_chat_text(text, for_embedding=True)
-    folded = fold_text(text).strip(" ¿?¡!.,;:")
-    word_count_value = len(text.split())
-    harvest_mode = (mode or FAQ_CANDIDATE_HARVEST_MODE or "broad").lower()
+    """
+    Decide si un mensaje de usuario debe entrar al clustering como posible fuente de FAQ.
 
-    if len(text) < 8 or word_count_value < 2 or len(text) > 280:
+    Filosofía:
+    - NO usar listas de temas de negocio.
+    - NO exigir prefijos de pregunta.
+    - NO intentar saber si habla de envío, precios, tallas, productos, clases, comida, etc.
+    - Solo eliminar ruido evidente.
+
+    La decisión semántica real debe ocurrir después:
+    clustering -> LLM -> alignment con cluster -> soporte de evidencia -> needs_review/pending.
+    """
+    raw_text = normalize_text(text)
+    raw_folded = fold_text(raw_text).strip(" ¿?¡!.,;:-_")
+
+    courtesy_noise_patterns = (
+        r"^(hola+|buenas|buenos dias|buenos días|buenas tardes|buenas noches)(\s+.*)?$",
+        r"^(hello|hi|hey|good morning|good afternoon|good evening)(\s+.*)?$",
+        r"^(gracias|muchas gracias|mil gracias|thank you|thanks|thx)(\s+.*)?$",
+        r"^(ok|okay|oki|dale|listo|perfecto|vale)(\s+gracias|\s+thank you|\s+thanks)?$",
+    )
+
+    if any(re.match(pattern, raw_folded, flags=re.IGNORECASE) for pattern in courtesy_noise_patterns):
+        return False    
+    clean = normalize_chat_text(raw_text, for_embedding=True)
+    folded = fold_text(clean).strip(" ¿?¡!.,;:-_")
+    words = clean.split()
+    word_count_value = len(words)
+
+    if not clean:
         return False
 
-    if EMAIL_PATTERN.search(text) or PHONE_PATTERN.search(text):
+    # Muy corto: normalmente no aporta intención.
+    if len(clean) < 6 or word_count_value < 2:
         return False
 
-    trivial = {
-        "hola", "buenas", "buenos dias", "buenas tardes", "buenas noches",
-        "si", "sí", "no", "ok", "dale", "gracias", "muchas gracias",
-        "hello", "hi", "hey", "yes", "nope", "ok thanks", "thank you", "thanks",
+    # Muy largo: suele ser conversación completa, queja larga, respuesta pegada o ruido.
+    # No lo matamos por tema, sino por forma.
+    if len(clean) > 320 or word_count_value > 55:
+        return False
+
+    if is_internal_tool_trace(clean):
+        return False
+
+    # Si después de quitar emojis no queda texto, es ruido.
+    if not EMOJI_PATTERN.sub("", clean).strip():
+        return False
+
+    # Rechazar mensajes cuyo único propósito sea compartir datos de contacto.
+    raw_has_email = bool(EMAIL_PATTERN.search(raw_text))
+    raw_has_phone = bool(PHONE_PATTERN.search(raw_text))
+    clean_has_email = bool(EMAIL_PATTERN.search(clean))
+    clean_has_phone = bool(PHONE_PATTERN.search(clean))
+
+    contact_intro_patterns = (
+        r"^(mi\s+)?correo\s+(es\s+)?",
+        r"^(mi\s+)?email\s+(es\s+)?",
+        r"^(my\s+)?email\s+(is\s+)?",
+        r"^(mi\s+)?telefono\s+(es\s+)?",
+        r"^(mi\s+)?tel[eé]fono\s+(es\s+)?",
+        r"^(mi\s+)?celular\s+(es\s+)?",
+        r"^(my\s+)?phone\s+(number\s+)?(is\s+)?",
+        r"^(te\s+dejo|le\s+dejo|env[ií]o|mando|comparto)\s+",
+    )
+
+    text_without_contact = EMAIL_PATTERN.sub("", raw_folded)
+    text_without_contact = PHONE_PATTERN.sub("", text_without_contact)
+    text_without_contact = normalize_text(text_without_contact.strip(" -:;,.!?¡¿"))
+
+    looks_like_contact_only = (
+        (raw_has_email or raw_has_phone or clean_has_email or clean_has_phone)
+        and (
+            not text_without_contact
+            or any(re.match(pattern, text_without_contact, flags=re.IGNORECASE) for pattern in contact_intro_patterns)
+            or text_without_contact in {"mi correo es", "mi email es", "my email is", "mi telefono es", "mi celular es"}
+        )
+    )
+
+    if looks_like_contact_only:
+        return False
+
+    without_email = EMAIL_PATTERN.sub("", clean)
+    without_phone = PHONE_PATTERN.sub("", without_email)
+    if not without_phone.strip(" -:;,.!?¡¿"):
+        return False
+
+    # Debe tener una cantidad mínima de letras reales.
+    alpha_chars = re.findall(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ]", clean)
+    if len(alpha_chars) < 5:
+        return False
+
+    # Rechazar respuestas triviales frecuentes.
+    trivial_messages = {
+        "si",
+        "sí",
+        "no",
+        "ok",
+        "okay",
+        "oki",
+        "dale",
+        "listo",
+        "bueno",
+        "vale",
+        "perfecto",
+        "gracias",
+        "muchas gracias",
+        "mil gracias",
+        "thank you",
+        "thanks",
+        "thx",
+        "yes",
+        "nope",
+        "hello",
+        "hi",
+        "hey",
+        "hola",
+        "buenas",
+        "buenos dias",
+        "buenos días",
+        "buenas tardes",
+        "buenas noches",
     }
-    if folded in trivial:
+
+    if folded in trivial_messages:
         return False
 
-    if not EMOJI_PATTERN.sub("", text).strip():
+    # Rechazar mensajes compuestos casi solo por saludos/cortesía.
+    courtesy_only_patterns = (
+        r"^(hola+|buenas|buenos dias|buenos días|buenas tardes|buenas noches)[\s,!.¿?]*$",
+        r"^(hello|hi|hey|good morning|good afternoon|good evening)[\s,!.¿?]*$",
+        r"^(gracias|muchas gracias|mil gracias|thank you|thanks|thx)[\s,!.¿?]*$",
+    )
+
+    if any(re.match(pattern, folded, flags=re.IGNORECASE) for pattern in courtesy_only_patterns):
         return False
 
-    non_faq_fragments = (
-        "quien soy", "que hora", "que rol", "hora es actualmente",
-        "who am i", "what time", "what role",
-    )
-    if any(fragment in folded for fragment in non_faq_fragments):
+    # Rechazar risas o ruido sin intención.
+    if re.fullmatch(r"(j+a+|j+e+|h+a+|x+d+|lol+|lmao+)+", folded):
         return False
 
-    interrogative_signals = (
-        "?", "¿",
-        "como ", "cómo ", "cuanto ", "cuánta ", "cuanta ", "cuantos ", "cuántos ",
-        "cual ", "cuál ", "cuales ", "cuáles ", "que ", "qué ", "donde ", "dónde ",
-        "cuando ", "cuándo ", "puedo ", "se puede ", "es posible ", "hay ",
-        "what ", "how ", "when ", "where ", "which ", "can ", "could ", "do you ",
-        "does ", "is there ", "are there ", "is it possible ",
+    # Rechazar mensajes con demasiada repetición de un mismo carácter/patrón.
+    compact = re.sub(r"\s+", "", folded)
+    if len(compact) >= 8:
+        most_common_char_count = Counter(compact).most_common(1)[0][1]
+        if most_common_char_count / len(compact) > 0.65:
+            return False
+
+    # Rechazar mensajes que parecen solo confirmación o seguimiento de caso individual.
+    # Esto NO es lista de temas; es lista de formas conversacionales pobres.
+    low_value_case_fragments = (
+        "ya te envie",
+        "ya te envié",
+        "ya envie",
+        "ya envié",
+        "ya pague",
+        "ya pagué",
+        "ya hice el pago",
+        "te mande",
+        "te mandé",
+        "te comparti",
+        "te compartí",
+        "adjunto comprobante",
+        "envio comprobante",
+        "envío comprobante",
+        "mando soporte",
+        "ya quedo",
+        "ya quedó",
+        "quedo atento",
+        "quedó atento",
     )
 
-    business_intent_terms = (
-        # ES
-        "envio", "envío", "domicilio", "entrega", "transportadora", "ciudad",
-        "producto", "productos", "catalogo", "catálogo", "precio", "precios",
-        "costo", "costos", "valor", "pagar", "pago", "pagos", "nequi",
-        "daviplata", "pse", "efecty", "tarjeta", "anticipo", "abono",
-        "reserva", "reservar", "agenda", "agendar", "horario", "horarios",
-        "disponible", "disponibilidad", "talla", "tallas", "color", "colores",
-        "personalizar", "personalizacion", "personalización", "logo",
-        "descuento", "promo", "promocion", "promoción", "pedido", "pedidos",
-        "recoger", "recogida", "punto fisico", "punto físico",
-        # EN
-        "shipping", "delivery", "pickup", "address", "city", "order", "orders",
-        "product", "products", "catalog", "price", "prices", "cost", "costs",
-        "payment", "pay", "card", "cash", "deposit", "advance", "booking",
-        "reservation", "schedule", "availability", "available", "size", "sizes",
-        "color", "colors", "custom", "customize", "personalized", "logo",
-        "discount", "promotion", "promo",
-    )
+    if any(fragment in folded for fragment in low_value_case_fragments):
+        return False
 
-    has_question_signal = any(signal in folded for signal in interrogative_signals)
-    has_business_intent = any(term in folded for term in business_intent_terms)
-
-    if harvest_mode == "strict":
-        return has_question_signal and has_business_intent
-
-    return has_question_signal or has_business_intent
+    # Si llegó hasta aquí, tiene suficiente señal para entrar al clustering.
+    # No necesitamos saber el tema. El pipeline posterior decide si sirve como FAQ.
+    return True
 
 def company_key(item: Dict[str, Any]) -> str:
     return normalize_text(str(item.get("company_id") or item.get("workspace_id") or "unknown"))
@@ -1593,11 +1710,7 @@ def validate_generated_candidate(candidate: Dict[str, Any]) -> Tuple[bool, str]:
         return False, "rejected_generation_confidence"
 
     if not is_valid_knowledge_statement(candidate.get("knowledge_statement", "")):
-        fallback_statement = normalize_text(candidate.get("canonical_answer", ""))
-        if is_valid_knowledge_statement(fallback_statement):
-            candidate["knowledge_statement"] = fallback_statement
-        else:
-            return False, "rejected_invalid_knowledge_statement"
+        return False, "rejected_invalid_knowledge_statement"
 
     if not is_valid_canonical_question(candidate.get("canonical_question", "")):
         return False, "rejected_invalid_canonical_question"
@@ -2049,14 +2162,10 @@ def can_persist_generation_for_review(
     """
     Decide si una salida imperfecta se puede guardar para revisión humana.
 
-    La idea:
-    - No persistir basura.
-    - Sí persistir preguntas claras aunque la respuesta necesite revisión.
+    No depende exclusivamente de categorías conocidas, porque el sistema debe
+    funcionar con negocios y temas no anticipados.
     """
     if not generation.get("publish"):
-        return False, None, None
-
-    if not intent_categories:
         return False, None, None
 
     question = normalize_text(generation.get("canonical_question", ""))
@@ -2072,16 +2181,29 @@ def can_persist_generation_for_review(
         "rejected_answer_not_supported_by_evidence",
     }
 
+    # Caso principal: pregunta buena, pero respuesta/statement/evidencia imperfecta.
     if question_ok and rejection_reason in recoverable_reasons:
         if not answer_ok:
             fallback_answer = build_prudent_answer([question], intent_categories)
             generation["canonical_answer"] = fallback_answer or "La respuesta requiere revisión humana antes de publicarse."
 
         if not is_valid_knowledge_statement(generation.get("knowledge_statement", "")):
-            generation["knowledge_statement"] = generation.get("canonical_answer", "")
+            generation["knowledge_statement"] = None
 
-        return True, "pregunta detectada con respuesta a revisar", "question_with_answer_review"
+        candidate_kind = (
+            "question_with_answer_review"
+            if rejection_reason in {
+                "rejected_invalid_canonical_answer",
+                "rejected_answer_not_supported_by_evidence",
+                "rejected_question_answer_misaligned",
+            }
+            else "full_faq"
+        )
 
+        return True, "pregunta detectada con respuesta a revisar", candidate_kind
+
+    # Caso secundario: respuesta buena, pregunta mala. Esto debe pasar por repair,
+    # no persistirse directo.
     if answer_ok and rejection_reason == "rejected_invalid_canonical_question":
         return False, None, None
 
@@ -2539,6 +2661,19 @@ def build_company_candidates(
     embeddings = encode_texts(user_texts)
     stats["embeddings_generated"] = len(embeddings)
     labels = cluster_embeddings(embeddings)
+
+    if len(labels) != len(embeddings):
+        print(
+            "Advertencia: cluster_embeddings devolvió una cantidad de labels distinta "
+            f"a embeddings. labels={len(labels)}, embeddings={len(embeddings)}. "
+            "Se ajustará la longitud para evitar errores."
+        )
+
+        if len(labels) > len(embeddings):
+            labels = labels[: len(embeddings)]
+        else:
+            labels = labels + ([-1] * (len(embeddings) - len(labels)))
+
     stats["silhouette_score"] = compute_silhouette(embeddings, labels)
 
     cluster_groups: Dict[int, List[int]] = defaultdict(list)
@@ -2906,9 +3041,14 @@ def build_company_candidates(
 
         question_text = generation["canonical_question"]
         answer_text = generation["canonical_answer"]
-        knowledge_statement = generation.get("knowledge_statement")
-        if knowledge_statement == "":
-            knowledge_statement = answer_text
+
+        raw_knowledge_statement = generation.get("knowledge_statement")
+        knowledge_statement = (
+            normalize_text(raw_knowledge_statement)
+            if is_valid_knowledge_statement(raw_knowledge_statement or "")
+            else None
+        )
+
         cluster_intent_statement = generation.get("cluster_intent_statement")
         if not is_valid_cluster_intent_statement(cluster_intent_statement or ""):
             cluster_intent_statement = derive_cluster_intent_statement(cluster_questions)

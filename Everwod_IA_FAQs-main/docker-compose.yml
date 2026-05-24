@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: everwod_faq_mvp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../sql:/sql:ro
+
+  ingest:
+    build: .
+    command: uvicorn ingest_service:app --host 0.0.0.0 --port 8001
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8001:8001"
+
+  suggestion:
+    build: .
+    command: uvicorn suggestion_service:app --host 0.0.0.0 --port 8003
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8003:8003"
+
+  validation:
+    build: .
+    command: uvicorn validation_service:app --host 0.0.0.0 --port 8004
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8004:8004"
+
+  scheduler:
+    build: .
+    command: python scheduler.py
+    env_file: .env
+    depends_on:
+      - db
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ./frontend:/app
+    environment:
+      VITE_USE_MOCKS: "false"
+      VITE_INGEST_API_URL: http://localhost:8001
+      VITE_SUGGESTION_API_URL: http://localhost:8003
+      VITE_VALIDATION_API_URL: http://localhost:8004
+    ports:
+      - "5173:5173"
+    depends_on:
+      - ingest
+      - suggestion
+      - validation
+
+volumes:
+  postgres_data:

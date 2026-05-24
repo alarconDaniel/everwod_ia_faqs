@@ -1,0 +1,46 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+ENV/
+
+# Variables de entorno y secretos locales
+.env
+.env.*
+!.env.example
+
+# Cache y archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cache de herramientas y tests
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Archivos generados por el prototipo
+data/*.json
+data/*.jsonl
+!data/.gitkeep
+
+# Dumps, backups y datos sensibles/pesados
+*.sql
+*.dump
+*.backup
+*.bak
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.temp
+
+# Configuracion local de editores
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

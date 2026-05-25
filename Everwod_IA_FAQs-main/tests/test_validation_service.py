@@ -3,8 +3,8 @@ from datetime import datetime
 import pytest
 from fastapi import HTTPException
 
-import validation_service as svc
-from faq_models import ValidationRequest
+from app.core.models import ValidationRequest
+import app.repository.faq_repository as repo
 
 
 class FakeCursor:
@@ -69,9 +69,9 @@ def test_approval_updates_candidate_inserts_event_and_promotes_faq(monkeypatch):
         "status": "pending",
     }
     cursor = FakeCursor(candidate)
-    monkeypatch.setattr(svc, "get_db_connection", lambda: FakeConnection(cursor))
+    monkeypatch.setattr(repo, "get_db_connection", lambda: FakeConnection(cursor))
 
-    response = svc.apply_validation(
+    response = repo.apply_validation(
         ValidationRequest(
             suggestion_id=candidate["candidate_id"],
             reviewer="Ana",
@@ -99,9 +99,9 @@ def test_needs_review_candidate_uses_same_approval_contract(monkeypatch):
         "status": "needs_review",
     }
     cursor = FakeCursor(candidate)
-    monkeypatch.setattr(svc, "get_db_connection", lambda: FakeConnection(cursor))
+    monkeypatch.setattr(repo, "get_db_connection", lambda: FakeConnection(cursor))
 
-    response = svc.apply_validation(
+    response = repo.apply_validation(
         ValidationRequest(
             suggestion_id=candidate["candidate_id"],
             reviewer="Ana",
@@ -119,7 +119,7 @@ def test_needs_review_candidate_uses_same_approval_contract(monkeypatch):
 
 def test_approval_without_agent_id_returns_clear_error():
     with pytest.raises(HTTPException) as exc_info:
-        svc.promote_candidate_to_existing_faq(
+        repo.promote_candidate_to_existing_faq(
             cursor=None,
             candidate={
                 "candidate_id": "11111111-1111-1111-1111-111111111111",
@@ -144,9 +144,9 @@ def test_validation_with_edit_promotes_edited_version(monkeypatch):
         "status": "pending",
     }
     cursor = FakeCursor(candidate)
-    monkeypatch.setattr(svc, "get_db_connection", lambda: FakeConnection(cursor))
+    monkeypatch.setattr(repo, "get_db_connection", lambda: FakeConnection(cursor))
 
-    response = svc.apply_validation(
+    response = repo.apply_validation(
         ValidationRequest(
             suggestion_id=candidate["candidate_id"],
             reviewer="Ana",

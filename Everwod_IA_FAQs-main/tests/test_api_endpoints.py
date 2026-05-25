@@ -2,9 +2,9 @@ from datetime import datetime
 
 from fastapi.testclient import TestClient
 
-import validation_service as svc
-import suggestion_service as suggestion_svc
-from faq_models import SuggestionResponse, SuggestionSummary, ValidationResponse
+import app.api.validation_service as svc
+import app.api.suggestion_service as suggestion_svc
+from app.core.models import SuggestionResponse, SuggestionSummary, ValidationResponse
 
 
 def test_health_endpoint():
@@ -105,13 +105,30 @@ def test_suggest_endpoint_uses_dynamic_since_days_and_workspace(monkeypatch):
         "average_cluster_size": 0.0,
     }
 
-    monkeypatch.setattr(suggestion_svc, "create_pipeline_run", lambda parameters, workspace_id=None: "run-1")
-    monkeypatch.setattr(suggestion_svc, "finish_pipeline_run", lambda *args, **kwargs: None)
-    monkeypatch.setattr(suggestion_svc, "fetch_conversation_records_with_metrics", fake_fetch_conversation_records)
-    monkeypatch.setattr(suggestion_svc, "load_existing_faqs_by_company", lambda: {})
-    monkeypatch.setattr(suggestion_svc, "build_suggestion_candidates", lambda *args, **kwargs: ([], dict(stats)))
-    monkeypatch.setattr(suggestion_svc, "persist_pipeline_results", lambda run_id, candidates, stats: [])
-    monkeypatch.setattr(suggestion_svc, "save_json", lambda *args, **kwargs: None)
+    def fake_run_suggestion_pipeline(request):
+        fake_fetch_conversation_records(
+            limit=request.limit,
+            since_days=request.since_days,
+            workspace_id=request.workspace_id,
+            agent_id=request.agent_id,
+        )
+        metric_payload = {
+            key: value
+            for key, value in stats.items()
+            if key not in {"company_count", "total_examples", "silhouette_score", "average_cluster_size"}
+        }
+        return SuggestionSummary(
+            company_count=0,
+            cluster_count=0,
+            total_examples=0,
+            average_cluster_size=0,
+            silhouette_score=None,
+            suggestions=[],
+            run_id="run-1",
+            **metric_payload,
+        )
+
+    monkeypatch.setattr(suggestion_svc, "run_suggestion_pipeline", fake_run_suggestion_pipeline)
 
     client = TestClient(suggestion_svc.app)
     response = client.post("/suggest", json={"limit": 15000, "since_days": 30, "workspace_id": 74})

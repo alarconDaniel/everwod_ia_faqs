@@ -8,34 +8,40 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-import suggestion_service as svc
-from ingest_service import fetch_conversation_records_with_metrics
+from app.core.common import normalize_text
+from app.pipeline.candidate_filter import is_good_faq_candidate
+from app.pipeline.cleaning import clean_answer_evidence, clean_question_evidence, is_answer_evidence_usable
+from app.pipeline.clustering import cluster_embeddings
+from app.pipeline.embeddings import _dot, _mean_vector, _normalize_vector, current_embedding_model_label, encode_texts
+from app.pipeline.generation import generate_faq_candidate_with_llm
+from app.pipeline.quality import cluster_intent_categories, is_mixed_intent_cluster, validate_generated_candidate
+from app.repository.faq_repository import fetch_conversation_records_with_metrics
 
 
 def cluster_debug(records: List[Dict[str, Any]], run_llm: bool = True) -> Dict[str, Any]:
     valid_items = []
     rejected_initial = 0
     for item in records:
-        user_text = svc.normalize_text(item.get("user_text"))
-        if user_text and svc.is_good_faq_candidate(user_text):
+        user_text = normalize_text(item.get("user_text"))
+        if user_text and is_good_faq_candidate(user_text):
             valid_items.append({**item, "user_text": user_text})
         elif user_text:
             rejected_initial += 1
 
     result: Dict[str, Any] = {
         "pairs_processed": len(records),
-        "candidate_questions_detected": len([item for item in records if svc.normalize_text(item.get("user_text"))]),
+        "candidate_questions_detected": len([item for item in records if normalize_text(item.get("user_text"))]),
         "candidate_questions_rejected_initial_filter": rejected_initial,
         "candidate_questions_kept_for_embedding": len(valid_items),
-        "embedding_model": svc.current_embedding_model_label(),
+        "embedding_model": current_embedding_model_label(),
         "clusters": [],
     }
     if not valid_items:
         return result
 
     user_texts = [item["user_text"] for item in valid_items]
-    embeddings = svc.encode_texts(user_texts)
-    labels = svc.cluster_embeddings(embeddings)
+    embeddings = encode_texts(user_texts)
+    labels = cluster_embeddings(embeddings)
     cluster_groups: Dict[int, List[int]] = {}
     for index, label in enumerate(labels):
         if label != -1:
@@ -44,21 +50,21 @@ def cluster_debug(records: List[Dict[str, Any]], run_llm: bool = True) -> Dict[s
     result["clusters_detected_before_quality_gates"] = len(cluster_groups)
 
     for label, indices in sorted(cluster_groups.items()):
-        center = svc._normalize_vector(svc._mean_vector([embeddings[index] for index in indices]))
-        support_values = [svc._dot(embeddings[index], center) for index in indices]
+        center = _normalize_vector(_mean_vector([embeddings[index] for index in indices]))
+        support_values = [_dot(embeddings[index], center) for index in indices]
         support = round(sum(support_values) / len(support_values), 4)
         min_support = round(min(support_values), 4)
         cluster_cohesion = round((support + min_support) / 2, 4)
-        sorted_indices = sorted(indices, key=lambda idx: svc._dot(embeddings[idx], center), reverse=True)
-        questions = [svc.clean_question_evidence(user_texts[index]) for index in sorted_indices]
+        sorted_indices = sorted(indices, key=lambda idx: _dot(embeddings[idx], center), reverse=True)
+        questions = [clean_question_evidence(user_texts[index]) for index in sorted_indices]
         answers = [
-            svc.clean_answer_evidence(valid_items[index].get("assistant_text", ""), valid_items[index].get("company_name"))
+            clean_answer_evidence(valid_items[index].get("assistant_text", ""), valid_items[index].get("company_name"))
             for index in sorted_indices
         ]
         generation: Dict[str, Any] = {}
         validation = {"accepted": None, "reason": "llm_not_run"}
         if run_llm:
-            generation = svc.generate_faq_candidate_with_llm(
+            generation = generate_faq_candidate_with_llm(
                 company_name=valid_items[sorted_indices[0]].get("company_name"),
                 questions=[user_texts[index] for index in indices],
                 historical_answers=[valid_items[index].get("assistant_text", "") for index in indices],
@@ -68,11 +74,11 @@ def cluster_debug(records: List[Dict[str, Any]], run_llm: bool = True) -> Dict[s
                     "min_support": min_support,
                     "cluster_cohesion": cluster_cohesion,
                     "valid_question_evidence_count": len(set(questions)),
-                    "valid_answer_evidence_count": sum(1 for answer in answers if svc.is_answer_evidence_usable(answer)),
+                    "valid_answer_evidence_count": sum(1 for answer in answers if is_answer_evidence_usable(answer)),
                 },
                 recurrence=len(indices),
             )
-            accepted, reason = svc.validate_generated_candidate(generation)
+            accepted, reason = validate_generated_candidate(generation)
             validation = {"accepted": accepted, "reason": reason}
 
         result["clusters"].append(
@@ -82,8 +88,8 @@ def cluster_debug(records: List[Dict[str, Any]], run_llm: bool = True) -> Dict[s
                 "support": support,
                 "min_support": min_support,
                 "cluster_cohesion": cluster_cohesion,
-                "intent_categories": sorted(svc.cluster_intent_categories(questions)),
-                "mixed_intent": svc.is_mixed_intent_cluster(questions),
+                "intent_categories": sorted(cluster_intent_categories(questions)),
+                "mixed_intent": is_mixed_intent_cluster(questions),
                 "questions": questions,
                 "answers": answers,
                 "llm_prompt": generation.get("prompt"),

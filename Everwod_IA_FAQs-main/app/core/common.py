@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import psycopg2
 
 
-ROOT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
@@ -18,6 +18,8 @@ for env_path in (ROOT_DIR / ".env", ROOT_DIR.parent / ".env"):
         load_dotenv(dotenv_path=env_path, override=False)
 
 FAQ_SCHEMA = os.getenv("FAQ_SCHEMA", "faq_mvp")
+FAQ_RAW_SCHEMA = os.getenv("FAQ_RAW_SCHEMA", "everwod_raw")
+FAQ_INGEST_SOURCE = os.getenv("FAQ_INGEST_SOURCE", FAQ_RAW_SCHEMA)
 
 
 def get_bool_env(name: str, default: bool = False) -> bool:
@@ -52,24 +54,19 @@ def get_db_config() -> Dict[str, str]:
 
 
 def get_db_connection() -> psycopg2.extensions.connection:
-    return psycopg2.connect(**get_db_config())
+    config = get_db_config()
+    return psycopg2.connect(
+        dbname=config["dbname"],
+        user=config["user"],
+        password=config["password"],
+        host=config["host"],
+        port=config["port"],
+    )
 
 
 def get_cors_origins() -> List[str]:
     raw = os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
-
-
-def configure_cors(app: Any) -> None:
-    from fastapi.middleware.cors import CORSMiddleware
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=get_cors_origins(),
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
 
 def json_text(payload: Any) -> str:

@@ -7,8 +7,8 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from faq_models import IngestRequest
-from suggestion_service import run_suggestion_pipeline
+from app.core.models import IngestRequest
+from app.pipeline.pipeline import run_suggestion_pipeline
 
 
 def main() -> None:

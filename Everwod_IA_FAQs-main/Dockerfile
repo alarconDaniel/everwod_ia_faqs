@@ -22,4 +22,4 @@ COPY . .
 
 EXPOSE 8003
 
-CMD ["uvicorn", "suggestion_service:app", "--host", "0.0.0.0", "--port", "8003"]
+CMD ["sh", "-c", "uvicorn app.api.main:app --host 0.0.0.0 --port ${PORT:-8003}"]

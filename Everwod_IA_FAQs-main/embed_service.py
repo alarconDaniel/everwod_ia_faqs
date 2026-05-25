@@ -3,8 +3,9 @@ from typing import List
 from fastapi import FastAPI
 from sentence_transformers import SentenceTransformer
 
-from faq_common import configure_cors, normalize_text
-from faq_models import EncodeRequest, EncodeResponse
+from app.api.cors import configure_cors
+from app.core.common import normalize_text
+from app.core.models import EncodeRequest, EncodeResponse
 
 # Aplicacion FastAPI del servicio de embeddings.
 app = FastAPI(title="Everwod FAQ Embedding Service")

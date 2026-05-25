@@ -1,9 +1,11 @@
 import { IngestRequest, SuggestionEditRequest, SuggestionsResponse, ValidationRecord, ValidationRequest, Workspace } from '../types/faq';
 import { mockFaqApi } from './mockFaqApi';
 
-const INGEST_API_URL = import.meta.env.VITE_INGEST_API_URL || 'http://127.0.0.1:8001';
-const SUGGESTION_API_URL = import.meta.env.VITE_SUGGESTION_API_URL || 'http://127.0.0.1:8003';
-const VALIDATION_API_URL = import.meta.env.VITE_VALIDATION_API_URL || 'http://127.0.0.1:8004';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8003';
+
+const INGEST_API_URL = import.meta.env.VITE_INGEST_API_URL || API_URL;
+const SUGGESTION_API_URL = import.meta.env.VITE_SUGGESTION_API_URL || API_URL;
+const VALIDATION_API_URL = import.meta.env.VITE_VALIDATION_API_URL || API_URL;
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 function withQuery(baseUrl: string, params: Record<string, string | number | boolean | undefined | null>) {

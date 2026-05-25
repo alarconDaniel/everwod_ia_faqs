@@ -1,0 +1,76 @@
+import os
+
+from app.core.common import (
+    DATA_DIR,
+    FAQ_INGEST_SOURCE,
+    FAQ_RAW_SCHEMA,
+    FAQ_SCHEMA,
+    ROOT_DIR,
+    get_bool_env,
+    get_cors_origins,
+    get_db_config,
+    get_db_connection,
+    get_float_env,
+    get_int_env,
+)
+
+
+DB_NAME = os.getenv("DB_NAME", "everwod_faq_mvp")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+
+CORS_ALLOW_ORIGINS = get_cors_origins()
+
+MODEL_NAME = os.getenv("FAQ_EMBEDDING_MODEL", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+FAQ_EMBEDDING_BACKEND = os.getenv("FAQ_EMBEDDING_BACKEND", "sentence-transformers")
+FAQ_HASH_EMBEDDING_DIM = get_int_env("FAQ_HASH_EMBEDDING_DIM", 96)
+
+FAQ_LLM_MODEL = os.getenv("FAQ_LLM_MODEL", "Qwen/Qwen3-1.7B")
+FAQ_LLM_ENABLED = get_bool_env("FAQ_LLM_ENABLED", False)
+FAQ_LLM_DEVICE = os.getenv("FAQ_LLM_DEVICE", "cpu").strip().lower()
+FAQ_LLM_TORCH_DTYPE = os.getenv("FAQ_LLM_TORCH_DTYPE", "auto").strip().lower()
+FAQ_LLM_THINKING_DISABLED = "qwen3" in FAQ_LLM_MODEL.lower()
+
+FAQ_CLEANING_ENABLED = get_bool_env("FAQ_CLEANING_ENABLED", True)
+FAQ_STRIP_EMOJIS = get_bool_env("FAQ_STRIP_EMOJIS", True)
+FAQ_STRIP_URLS = get_bool_env("FAQ_STRIP_URLS", True)
+FAQ_SUPPORTED_LANGUAGES = {
+    language.strip().lower()
+    for language in os.getenv("FAQ_SUPPORTED_LANGUAGES", "es,en").split(",")
+    if language.strip()
+}
+
+FAQ_CLUSTER_ALGORITHM = os.getenv("FAQ_CLUSTER_ALGORITHM", "auto").strip().lower()
+FAQ_CLUSTER_EPS = get_float_env("FAQ_CLUSTER_EPS", 0.34)
+FAQ_HDBSCAN_MIN_CLUSTER_SIZE = get_int_env("FAQ_HDBSCAN_MIN_CLUSTER_SIZE", 3)
+FAQ_HDBSCAN_MIN_SAMPLES = get_int_env("FAQ_HDBSCAN_MIN_SAMPLES", 2)
+FAQ_ENABLE_HIERARCHICAL_FALLBACK = get_bool_env("FAQ_ENABLE_HIERARCHICAL_FALLBACK", True)
+
+FAQ_MIN_CLUSTER_SIZE = get_int_env("FAQ_MIN_CLUSTER_SIZE", 3)
+FAQ_MIN_CLUSTER_SUPPORT = get_float_env("FAQ_MIN_CLUSTER_SUPPORT", 0.58)
+FAQ_MIN_CLUSTER_COHESION = get_float_env("FAQ_MIN_CLUSTER_COHESION", 0.60)
+FAQ_MIN_GENERATION_CONFIDENCE = get_float_env("FAQ_MIN_GENERATION_CONFIDENCE", 0.20)
+FAQ_SKIP_REJECTED = get_bool_env("FAQ_SKIP_REJECTED", True)
+FAQ_SKIP_EXISTING = get_bool_env("FAQ_SKIP_EXISTING", True)
+FAQ_DUPLICATE_THRESHOLD = get_float_env("FAQ_DUPLICATE_THRESHOLD", 0.78)
+FAQ_CANDIDATE_HARVEST_MODE = os.getenv("FAQ_CANDIDATE_HARVEST_MODE", "broad").strip().lower()
+FAQ_ALLOW_TWO_EXAMPLE_CLUSTERS = get_bool_env("FAQ_ALLOW_TWO_EXAMPLE_CLUSTERS", True)
+FAQ_TWO_EXAMPLE_MIN_COHESION = get_float_env("FAQ_TWO_EXAMPLE_MIN_COHESION", 0.80)
+FAQ_HIGH_CONFIDENCE_THRESHOLD = 0.72
+FAQ_REJECT_CLUSTER_SUPPORT = max(0.35, FAQ_MIN_CLUSTER_SUPPORT - 0.12)
+FAQ_REJECT_CLUSTER_COHESION = max(0.35, FAQ_MIN_CLUSTER_COHESION - 0.12)
+FAQ_MIN_QUESTION_EVIDENCE = 2
+FAQ_MAX_CANONICAL_QUESTION_WORDS = 18
+FAQ_MAX_CANONICAL_ANSWER_WORDS = 55
+FAQ_ALIGNMENT_STRONG_SIMILARITY = get_float_env("FAQ_ALIGNMENT_STRONG_SIMILARITY", 0.56)
+FAQ_ALIGNMENT_PARTIAL_SIMILARITY = get_float_env("FAQ_ALIGNMENT_PARTIAL_SIMILARITY", 0.42)
+
+FAQ_SCHEDULE_INTERVAL_DAYS = get_int_env("FAQ_SCHEDULE_INTERVAL_DAYS", 30)
+FAQ_SCHEDULE_SINCE_DAYS = get_int_env("FAQ_SCHEDULE_SINCE_DAYS", 365)
+FAQ_MONTHLY_RUN_INGEST = get_bool_env("FAQ_MONTHLY_RUN_INGEST", False)
+FAQ_SAFE_FULL_ANALYSIS_LIMIT = max(1, get_int_env("FAQ_SAFE_FULL_ANALYSIS_LIMIT", 50000))
+
+SUGGESTIONS_PATH = DATA_DIR / "faq_suggestions.json"
+CONVERSATIONS_PATH = DATA_DIR / "conversations.jsonl"

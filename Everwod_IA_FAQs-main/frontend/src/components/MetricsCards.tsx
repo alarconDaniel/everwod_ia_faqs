@@ -41,9 +41,16 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-          <p className="text-[10px] uppercase font-bold text-slate-400 tracking-tighter">Silhouette</p>
+          <p
+  className="text-[10px] uppercase font-bold text-slate-400 tracking-tighter"
+  title="Métrica calculada sobre los clusters generados por el pipeline. Puede diferir del número de sugerencias visibles."
+>
+  Silhouette pipeline
+</p>
           <p className="text-xl font-bold text-indigo-600">
-            {metrics.silhouette_score === null ? 'N/D' : metrics.silhouette_score.toFixed(2)}
+            {typeof metrics.silhouette_score === 'number' && Number.isFinite(metrics.silhouette_score)
+              ? metrics.silhouette_score.toFixed(2)
+              : 'N/D'}
           </p>
         </div>
       </div>

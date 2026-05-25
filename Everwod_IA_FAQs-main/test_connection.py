@@ -1,6 +1,6 @@
 import psycopg2
 
-from faq_common import FAQ_SCHEMA, get_db_config
+from app.core.common import FAQ_SCHEMA, get_db_config
 
 
 DB_CONFIG = get_db_config()

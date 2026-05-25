@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-import ingest_service as svc
-from ingest_service import pair_user_assistant_messages
+import app.repository.faq_repository as repo
+from app.repository.faq_repository import pair_user_assistant_messages
 
 
 def test_pairs_last_user_with_next_assistant_and_ignores_empty_messages():
@@ -170,10 +170,10 @@ def test_complete_if_fits_uses_safe_limit_without_truncation(monkeypatch):
             }
         ]
     )
-    monkeypatch.setattr(svc, "FAQ_SAFE_FULL_ANALYSIS_LIMIT", 50000)
-    monkeypatch.setattr(svc, "get_db_connection", lambda: FakeConnection(cursor))
+    monkeypatch.setattr(repo, "FAQ_SAFE_FULL_ANALYSIS_LIMIT", 50000)
+    monkeypatch.setattr(repo, "get_db_connection", lambda: FakeConnection(cursor))
 
-    _rows, metrics = svc.fetch_message_rows_with_metrics(limit=None, since_days=365, workspace_id=126)
+    _rows, metrics = repo.fetch_message_rows_with_metrics(limit=None, since_days=365, workspace_id=126)
 
     assert cursor.params[-1] == 50000
     assert metrics["analysis_limit_mode"] == "complete_if_fits"
@@ -207,10 +207,10 @@ def test_complete_if_fits_reports_truncation_when_over_safe_limit(monkeypatch):
             }
         ]
     )
-    monkeypatch.setattr(svc, "FAQ_SAFE_FULL_ANALYSIS_LIMIT", 5)
-    monkeypatch.setattr(svc, "get_db_connection", lambda: FakeConnection(cursor))
+    monkeypatch.setattr(repo, "FAQ_SAFE_FULL_ANALYSIS_LIMIT", 5)
+    monkeypatch.setattr(repo, "get_db_connection", lambda: FakeConnection(cursor))
 
-    _rows, metrics = svc.fetch_message_rows_with_metrics(limit=None, since_days=365, workspace_id=126)
+    _rows, metrics = repo.fetch_message_rows_with_metrics(limit=None, since_days=365, workspace_id=126)
 
     assert cursor.params[-1] == 5
     assert metrics["analysis_limit_mode"] == "complete_if_fits"

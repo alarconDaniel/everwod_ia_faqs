@@ -17,12 +17,18 @@ class IngestRequest(BaseModel):
     since_days: int = Field(90, ge=1, le=3650)
     workspace_id: Optional[int] = None
     agent_id: Optional[str] = None
+    dry_run: bool = True
+    source: Optional[str] = None
 
 
 class IngestResponse(BaseModel):
     imported_records: int
     output_file: str
     source_schema: str = "faq_mvp"
+    raw_schema: Optional[str] = None
+    target_schema: Optional[str] = None
+    source: Optional[str] = None
+    dry_run: bool = True
     limit: Optional[int] = None
     effective_limit: Optional[int] = None
     analysis_limit_mode: Optional[str] = None
@@ -36,6 +42,19 @@ class IngestResponse(BaseModel):
     conversations_processed_after_limit: Optional[int] = None
     truncation_applied: bool = False
     truncation_ratio: float = 0.0
+    workspaces_read: Optional[int] = None
+    agents_read: Optional[int] = None
+    chats_read: Optional[int] = None
+    messages_read: Optional[int] = None
+    faqs_read: Optional[int] = None
+    user_messages: Optional[int] = None
+    assistant_messages: Optional[int] = None
+    user_assistant_pairs_built: Optional[int] = None
+    messages_skipped_invalid_json: Optional[int] = None
+    messages_skipped_empty_text: Optional[int] = None
+    duplicates_omitted: Optional[int] = None
+    records_written: Optional[int] = None
+    records_omitted: Optional[int] = None
 
 
 class EncodeRequest(BaseModel):

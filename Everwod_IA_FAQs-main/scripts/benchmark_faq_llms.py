@@ -9,9 +9,11 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-import suggestion_service as svc
+import app.pipeline.generation as generation
+from app.pipeline.cleaning import word_count
+from app.pipeline.quality import is_question_answer_aligned
 from debug_workspace_pipeline import cluster_debug
-from ingest_service import fetch_conversation_records_with_metrics
+from app.repository.faq_repository import fetch_conversation_records_with_metrics
 
 
 DEFAULT_MODELS = [
@@ -22,20 +24,19 @@ DEFAULT_MODELS = [
 
 
 def reset_llm(model_name: str) -> None:
-    svc.FAQ_LLM_MODEL = model_name
-    svc.FAQ_LLM_ENABLED = True
-    svc.MODELS_READY = False
-    svc.ANSWER_GENERATOR_READY = False
-    svc.ANSWER_GENERATOR = None
-    svc.EMBEDDING_MODEL = svc.EMBEDDING_MODEL
-    svc.load_models()
+    generation.FAQ_LLM_MODEL = model_name
+    generation.FAQ_LLM_ENABLED = True
+    generation.MODELS_READY = False
+    generation.ANSWER_GENERATOR_READY = False
+    generation.ANSWER_GENERATOR = None
+    generation.load_models()
 
 
 def run_for_model(model_name: str, records: List[Dict[str, Any]]) -> Dict[str, Any]:
     started = time.perf_counter()
     try:
         reset_llm(model_name)
-        if not svc.ANSWER_GENERATOR:
+        if not generation.ANSWER_GENERATOR:
             return {
                 "model": model_name,
                 "load_or_generation_error": "model_unavailable",
@@ -49,7 +50,7 @@ def run_for_model(model_name: str, records: List[Dict[str, Any]]) -> Dict[str, A
             question = parsed.get("canonical_question") or ""
             answer = parsed.get("canonical_answer") or ""
             knowledge = parsed.get("knowledge_statement") or ""
-            aligned, alignment_reason = svc.is_question_answer_aligned(question, answer, knowledge)
+            aligned, alignment_reason = is_question_answer_aligned(question, answer, knowledge)
             rows.append(
                 {
                     "cluster_id": cluster.get("cluster_id"),
@@ -64,8 +65,8 @@ def run_for_model(model_name: str, records: List[Dict[str, Any]]) -> Dict[str, A
                     "question_answer_aligned": aligned,
                     "alignment_reason": alignment_reason,
                     "contains_thinking_text": "<think>" in (cluster.get("llm_raw_json") or "").lower(),
-                    "question_words": svc.word_count(question),
-                    "answer_words": svc.word_count(answer),
+                    "question_words": word_count(question),
+                    "answer_words": word_count(answer),
                     "generation_elapsed_ms": parsed.get("generation_elapsed_ms"),
                     "validation": cluster.get("validation"),
                 }

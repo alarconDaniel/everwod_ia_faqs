@@ -40,9 +40,6 @@ export function ValidationHistory({ validations }: ValidationHistoryProps) {
           </div>
         ))}
       </div>
-      <div className="p-4 bg-slate-50 border-t border-slate-100 rounded-b-2xl shrink-0 mt-auto">
-        <button className="w-full py-2 text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors uppercase tracking-widest outline-none">Exportar JSON</button>
-      </div>
     </>
   );
 }

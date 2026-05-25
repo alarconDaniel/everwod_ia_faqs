@@ -39,36 +39,40 @@ export function SuggestionCard({ suggestion, onValidate }: SuggestionCardProps) 
 
   return (
     <div className="bg-white border-2 border-indigo-100 rounded-lg p-5 shadow-sm relative group overflow-hidden">
-      <div className="absolute top-5 right-5 flex flex-wrap gap-1 justify-end max-w-[150px]">
-        <span className="px-2 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded">ID: {suggestion.id.slice(0,8)}</span>
-        <span className="px-2 py-1 bg-green-50 text-[10px] font-bold text-green-700 rounded">Score: {suggestion.cluster_score.toFixed(1)}</span>
-        {suggestion.quality_tier && (
-          <span className={cn("px-2 py-1 text-[10px] font-bold rounded uppercase",
-            suggestion.quality_tier === 'needs_review' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}>
-            {suggestion.quality_tier === 'needs_review' ? 'Review' : 'Alta'}
-          </span>
-        )}
-        {suggestion.status !== 'pending' && (
-          <span className={cn("px-2 py-1 text-[10px] font-bold rounded uppercase", 
-            suggestion.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 
-            suggestion.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800')}>
-            {suggestion.status}
-          </span>
-        )}
-        {suggestion.was_human_edited && (
-          <span className="px-2 py-1 text-[10px] font-bold rounded uppercase bg-indigo-100 text-indigo-800">
-            Editada
-          </span>
-        )}
-        {suggestion.candidate_kind === 'question_with_answer_review' && (
-          <span className="px-2 py-1 text-[10px] font-bold rounded uppercase bg-sky-100 text-sky-800">
-            Respuesta
-          </span>
-        )}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-bold text-indigo-600 uppercase mb-1 truncate">{suggestion.company_name}</p>
+          <h4 className="text-base font-bold text-slate-900 mb-2 truncate">{suggestion.question}</h4>
+        </div>
+        <div className="flex max-w-full shrink-0 flex-wrap gap-1 sm:max-w-[220px] sm:justify-end">
+          <span className="px-2 py-1 bg-slate-100 text-[10px] font-bold text-slate-600 rounded whitespace-nowrap">ID: {suggestion.id.slice(0,8)}</span>
+          <span className="px-2 py-1 bg-green-50 text-[10px] font-bold text-green-700 rounded whitespace-nowrap">Score: {suggestion.cluster_score.toFixed(1)}</span>
+          {suggestion.quality_tier && (
+            <span className={cn("px-2 py-1 text-[10px] font-bold rounded uppercase whitespace-nowrap",
+              suggestion.quality_tier === 'needs_review' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}>
+              {suggestion.quality_tier === 'needs_review' ? 'Review' : 'Alta'}
+            </span>
+          )}
+          {suggestion.status !== 'pending' && (
+            <span className={cn("px-2 py-1 text-[10px] font-bold rounded uppercase whitespace-nowrap", 
+              suggestion.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 
+              suggestion.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800')}>
+              {suggestion.status}
+            </span>
+          )}
+          {suggestion.was_human_edited && (
+            <span className="px-2 py-1 text-[10px] font-bold rounded uppercase bg-indigo-100 text-indigo-800 whitespace-nowrap">
+              Editada
+            </span>
+          )}
+          {suggestion.candidate_kind === 'question_with_answer_review' && (
+            <span className="px-2 py-1 text-[10px] font-bold rounded uppercase bg-sky-100 text-sky-800 whitespace-nowrap">
+              Respuesta
+            </span>
+          )}
+        </div>
       </div>
 
-      <p className="text-[10px] font-bold text-indigo-600 uppercase mb-1 truncate pr-[160px]">{suggestion.company_name}</p>
-      <h4 className="text-base font-bold text-slate-900 mb-2 truncate">{suggestion.question}</h4>
       <p className="text-sm text-slate-600 line-clamp-2 mb-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
         {suggestion.answer}
       </p>

@@ -3,6 +3,9 @@
 venv/
 env/
 ENV/
+node_modules/
+frontend/node_modules/
+frontend/dist/
 
 # Variables de entorno y secretos locales
 .env
@@ -29,6 +32,7 @@ data/*.jsonl
 # Dumps, backups y datos sensibles/pesados
 *.sql
 *.dump
+*.zip
 *.backup
 *.bak
 
@@ -44,3 +48,8 @@ data/*.jsonl
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+data/debug/
+data/benchmark_*.json
+data/pipeline_*.json
+data/debug_workspace_*.json

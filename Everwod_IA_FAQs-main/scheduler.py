@@ -1,49 +1,7 @@
-from datetime import datetime
+"""Legacy entrypoint for the monthly FAQ scheduler."""
 
-from apscheduler.schedulers.blocking import BlockingScheduler
-
-from faq_common import get_int_env
-from faq_models import IngestRequest
-from suggestion_service import run_suggestion_pipeline
-
-
-FAQ_SCHEDULE_INTERVAL_DAYS = get_int_env("FAQ_SCHEDULE_INTERVAL_DAYS", 30)
-FAQ_SCHEDULE_SINCE_DAYS = get_int_env("FAQ_SCHEDULE_SINCE_DAYS", 365)
-
-
-def scheduled_pipeline() -> None:
-    start = datetime.utcnow()
-    print(f"[{start.isoformat()}] Iniciando pipeline mensual de FAQ automatica...")
-
-    request = IngestRequest(
-        limit=None,
-        since_days=FAQ_SCHEDULE_SINCE_DAYS,
-        workspace_id=None,
-        agent_id=None,
-    )
-
-    summary = run_suggestion_pipeline(request)
-
-    print(f"  - Pipeline run: {summary.run_id}")
-    print(f"  - Empresas analizadas: {summary.company_count}")
-    print(f"  - Candidatos generados/actualizados: {summary.cluster_count}")
-    print(f"  - Ejemplos candidatos: {summary.total_examples}")
-    print(f"  - Silhouette: {summary.silhouette_score}")
-    print(f"[{datetime.utcnow().isoformat()}] Pipeline completado.")
+from app.jobs.scheduler import main, scheduled_pipeline
 
 
 if __name__ == "__main__":
-    scheduler = BlockingScheduler()
-    scheduler.add_job(
-        scheduled_pipeline,
-        "interval",
-        days=FAQ_SCHEDULE_INTERVAL_DAYS,
-        next_run_time=datetime.now(),
-    )
-
-    print(f"Scheduler iniciado: el job se ejecutara cada {FAQ_SCHEDULE_INTERVAL_DAYS} dias.")
-
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        print("Scheduler detenido manualmente.")
+    main()

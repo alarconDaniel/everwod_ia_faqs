@@ -494,12 +494,12 @@ Invoke-RestMethod http://127.0.0.1:8003/validations
 
 | Documento                                                          | Descripción                                                         |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)                     | Arquitectura técnica completa, pipeline, validación y persistencia. |
-| [`frontend/README.md`](frontend/README.md)                         | Guía específica para ejecutar y configurar el panel React/Vite.     |
-| [`docs/data_dictionary.md`](docs/data_dictionary.md)               | Diccionario de datos del schema `faq_mvp`.                          |
-| [`docs/source_schema_analysis.md`](docs/source_schema_analysis.md) | Análisis del dump crudo de Everwod y tablas fuente.                 |
-| [`docs/DEPLOYMENT_RAILWAY.md`](docs/DEPLOYMENT_RAILWAY.md)         | Guía de despliegue en Railway.                                      |
-| [`docs/QUALITY_ISO25010.md`](docs/QUALITY_ISO25010.md)             | Decisiones de calidad alineadas con ISO/IEC 25010.                  |
+| [`Arquitectura técnica`](docs/ARCHITECTURE.md)                     | Arquitectura técnica completa, pipeline, validación y persistencia. |
+| [`Frontend`](Everwod_IA_FAQs-main/frontend/README.md)    | Guía específica para ejecutar y configurar el panel React/Vite.     |
+| [`Diccionario de datos`](docs/data_dictionary.md)               | Diccionario de datos del schema `faq_mvp`.                          |
+| [`Análisis del schema fuente`](docs/source_schema_analysis.md) | Análisis del dump crudo de Everwod y tablas fuente.                 |
+| [`Despliegue en Railway`](docs/DEPLOYMENT_RAILWAY.md)         | Guía de despliegue en Railway.                                      |
+| [`Calidad ISO/IEC 25010`](docs/QUALITY_ISO25010.md)             | Decisiones de calidad alineadas con ISO/IEC 25010.                  |
 
 ---
 
@@ -546,9 +546,9 @@ Pendiente para producción real:
 
 ---
 
-## 👥 Equipo
+## 👥 Autor
 
-Proyecto desarrollado como prototipo académico para el reto de Everwod Technologies.
+Daniel Esteban Alarcón Rojas.
 
 ---
 

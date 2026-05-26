@@ -1,3 +1,5 @@
+
+
 # 🧠 Everwod FAQ Intelligence
 
 > Microservicio inteligente para detectar preguntas recurrentes en conversaciones históricas de WhatsApp, generar sugerencias automáticas de FAQs y permitir validación humana antes de publicarlas.
@@ -8,6 +10,12 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-faq__mvp%20%2B%20everwod__raw-4169E1?logo=postgresql)
 ![LLM](https://img.shields.io/badge/LLM-Qwen3--1.7B-purple)
 ![Status](https://img.shields.io/badge/status-prototipo%20funcional-success)
+
+---
+
+<p align="center">
+  <img src="./docs/assets/banner.png" alt="Everwod IA FAQs Banner" width="100%">
+</p>
 
 ---
 
@@ -90,7 +98,6 @@ Everwod_IA_FAQs-main/
 ├── frontend/         # Panel React/Vite para revisión humana
 ├── scripts/          # Scripts de ejecución, debug y benchmark
 ├── tests/            # Pruebas automatizadas
-├── docs/             # Documentación técnica
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -237,6 +244,7 @@ FAQ_DUPLICATE_THRESHOLD=0.82
 ### 1. Backend
 
 ```powershell
+cd Everwod_IA_FAQs-main
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt

@@ -1,0 +1,670 @@
+{
+  "workspace_id": 126,
+  "since_days": 90,
+  "limit": 15000,
+  "ingest_metrics": {
+    "limit": 15000,
+    "since_days": 90,
+    "raw_messages_found": 7966,
+    "raw_messages_processed": 7966,
+    "total_messages_found_before_limit": 7966,
+    "total_messages_processed_after_limit": 7966,
+    "conversations_found": 1734,
+    "conversations_processed": 1734,
+    "conversations_found_before_limit": 1734,
+    "conversations_processed_after_limit": 1734,
+    "truncation_applied": false,
+    "truncation_ratio": 0.0,
+    "oldest_message_processed_at": "2026-02-14 07:13:09",
+    "newest_message_processed_at": "2026-04-08 21:26:05",
+    "user_messages_considered": 4293,
+    "assistant_messages_considered": 3673,
+    "user_assistant_pairs_built": 3525,
+    "pairs_rejected_no_assistant_followup": 44,
+    "pairs_rejected_empty_text": 0
+  },
+  "models": [
+    {
+      "model": "Qwen/Qwen2.5-0.5B-Instruct",
+      "elapsed_seconds": 332.403,
+      "clusters": [
+        {
+          "cluster_id": 0,
+          "cluster_size": 942,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo obtener una taza para mi novia?",
+          "answer": "¡Perfecto, Juliana! Con el #8750 escríbele ya a nuestro WhatsApp humano y te confirman el estado exacto y la guía. Los mensajes de Deprisa son normales; contesta sus llamadas para evitar reenvíos.",
+          "knowledge_statement": "¿Cómo puedo obtener una taza para mi novia?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 32,
+          "generation_elapsed_ms": 35752.87,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 1,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo obtener el catálogo?",
+          "answer": "No tengo información sobre catálogos específicos de esta empresa.",
+          "knowledge_statement": "¿Cómo puedo obtener el catálogo?",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 5,
+          "answer_words": 9,
+          "generation_elapsed_ms": 17976.31,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 2,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo resolver mi problema de transferencia de pedido?",
+          "answer": "Para resolver tu problema, asegúrate de que el pedido esté confirmado en la página web y que no haya sido confinado. Si aún tienes problemas, contacta a nuestro servicio de atención al cliente.",
+          "knowledge_statement": "¿Cómo puedo solucionar mi problema de transferencia de pedido?",
+          "publish": true,
+          "confidence": 0.75,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 9,
+          "answer_words": 33,
+          "generation_elapsed_ms": 20552.43,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 3,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "",
+          "answer": "",
+          "knowledge_statement": "",
+          "publish": false,
+          "confidence": 0.0,
+          "valid_json": true,
+          "question_answer_aligned": false,
+          "alignment_reason": "rejected_question_answer_misaligned",
+          "contains_thinking_text": false,
+          "question_words": 0,
+          "answer_words": 0,
+          "generation_elapsed_ms": null,
+          "validation": {
+            "accepted": false,
+            "reason": "llm_publish_false"
+          }
+        },
+        {
+          "cluster_id": 4,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo personalizar mi cuenta con un solo logo y una línea o dos arriba?",
+          "answer": "¡Por supuesto! Para obtener un logo único, necesitarás un diseño profesional. Si deseas personalizar tu cuenta, te recomiendo que veas los diferentes diseños disponibles en nuestra página web y selecciones uno que más se ajuste a tus preferencias.",
+          "knowledge_statement": "¿Podría proporcionarte un logo de la empresa y cómo podrías personalizarlo?",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 15,
+          "answer_words": 38,
+          "generation_elapsed_ms": 24991.42,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 5,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Entregan tarjetas de regalo y empaque?",
+          "answer": "Sí, entran tarjetas de regalo y empaque junto con tarjetas de regalo y empaque.",
+          "knowledge_statement": "Entregan tarjetas de regalo y empaque.",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 6,
+          "answer_words": 14,
+          "generation_elapsed_ms": 18677.86,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 6,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Hay opción de ver el diseño previo a la impresión?",
+          "answer": "Sí, se puede ver el diseño previo a la impresión.",
+          "knowledge_statement": "La empresa ofrece un servicio de diseño previo a la impresión.",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 10,
+          "answer_words": 10,
+          "generation_elapsed_ms": 18806.68,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 7,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Qué tipo de diseño necesitas?",
+          "answer": "Para este proyecto, necesitarías un diseño visual creativo y funcional.",
+          "knowledge_statement": "¿Cómo puedo ayudarte con este diseño?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 5,
+          "answer_words": 10,
+          "generation_elapsed_ms": 20365.1,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 8,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Y en qué opción pongo la frase?",
+          "answer": "No hay información relevante sobre esta pregunta.",
+          "knowledge_statement": "¿Y respecto a la frase?",
+          "publish": true,
+          "confidence": 0.75,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 7,
+          "answer_words": 7,
+          "generation_elapsed_ms": 17803.2,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 9,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo cancelar mi pedido?",
+          "answer": "Para cancelar tu pedido, debes proporcionar los datos necesarios para confirmarlo.",
+          "knowledge_statement": "¿Cómo puedo cancelar mi pedido?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 5,
+          "answer_words": 11,
+          "generation_elapsed_ms": 18146.27,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 10,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cómo puedo ver los resultados antes de imprimir?",
+          "answer": "No hay respuestas históricas limpias.",
+          "knowledge_statement": "¿Cómo puedo ver los resultados antes de imprimir?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 5,
+          "generation_elapsed_ms": 19474.05,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 11,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Qué tipo de color tendrías que ser?",
+          "answer": "No tengo información específica sobre el tipo de color.",
+          "knowledge_statement": "¿Tendrías que ser únicamente en blanco y negro?",
+          "publish": true,
+          "confidence": 0.75,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 7,
+          "answer_words": 9,
+          "generation_elapsed_ms": 18888.86,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 12,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cuál es la peltre ola school?",
+          "answer": "La peltre ola school es un tipo de música popular que se caracteriza por su melodía melódica y sus letras son conocidas por su humor y humorado.",
+          "knowledge_statement": "¿Qué es la peltre ola school?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 6,
+          "answer_words": 27,
+          "generation_elapsed_ms": 19696.03,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 13,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Me gustaría personalizar el rostro de la persona en medias y en ropa interior se puede?",
+          "answer": "De personalizar el rostro de la persona en medias y en ropa interior se puede.",
+          "knowledge_statement": "¿Disculpa, una pregunta. La opción de ropa interior la tienen también para mujer?",
+          "publish": true,
+          "confidence": 0.95,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 16,
+          "answer_words": 15,
+          "generation_elapsed_ms": 20342.51,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        },
+        {
+          "cluster_id": 14,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen2.5-0.5B-Instruct",
+          "question": "¿Cuáles son los cuadros de uña? ¿Y qué significa el otro?",
+          "answer": "Los cuadros de uña son pequeñas áreas donde se pueden ver las uñas. El otro es un color diferente.",
+          "knowledge_statement": "¿Qué son los cuadros de uña? ¿Y qué significa el otro?",
+          "publish": true,
+          "confidence": 0.75,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 11,
+          "answer_words": 19,
+          "generation_elapsed_ms": 20937.78,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_knowledge_statement"
+          }
+        }
+      ]
+    },
+    {
+      "model": "Qwen/Qwen3-1.7B",
+      "elapsed_seconds": 1052.861,
+      "clusters": [
+        {
+          "cluster_id": 0,
+          "cluster_size": 942,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Cuál es el precio mínimo para una taza personalizable en [persona]?",
+          "answer": "Los precios inician desde $55.000, variando según el modelo, caras y personalización.",
+          "knowledge_statement": "Ofrece tazas personalizables con precios desde $55.000, disponibles en modelos peltre y mágica, con opción de personalizar caras, textos y estilos.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": false,
+          "alignment_reason": "rejected_question_answer_misaligned",
+          "contains_thinking_text": false,
+          "question_words": 11,
+          "answer_words": 13,
+          "generation_elapsed_ms": 117699.58,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 1,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Me envían el catálogo?",
+          "answer": "Se enviará el catálogo gratuito sin costo adicional.",
+          "knowledge_statement": "La empresa ofrece catálogo gratuito.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 4,
+          "answer_words": 8,
+          "generation_elapsed_ms": 58606.59,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 2,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Cómo se resuelve el caso de la transferencia cayendo y el pedido no confirmado en la página?",
+          "answer": "Se recomienda verificar la confirmación del pedido y contactar al soporte para resolver la situación.",
+          "knowledge_statement": "El pedido se confinó pero no se pagó, y la transferencia se cayó, sin confirmación en la página.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 17,
+          "answer_words": 15,
+          "generation_elapsed_ms": 66955.26,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        },
+        {
+          "cluster_id": 3,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Qué factores influyen en el valor de [persona]?",
+          "answer": "El valor de depende de la complejidad del diseño, la calidad de los materiales y la cantidad de piezas.",
+          "knowledge_statement": "El valor de depende de factores como la complejidad del diseño, la calidad de los materiales y la cantidad de piezas.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 19,
+          "generation_elapsed_ms": 63370.67,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 4,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Se pueden personalizar con un solo logo al lado y una línea o dos arriba?",
+          "answer": "Sí, se pueden personalizar con un solo logo al lado y una línea o dos arriba, pero se requiere validar con diseño antes de la compra. El precio varía según la personalización.",
+          "knowledge_statement": "Ofrece personalización de logos en medias con opciones de diseño especializado y precios desde $50.000.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 15,
+          "answer_words": 32,
+          "generation_elapsed_ms": 80522.65,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 5,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Ofrecen tarjetas de regalo y empaque?",
+          "answer": "Sí, ofrecen tarjetas de regalo y empaque como parte de sus servicios.",
+          "knowledge_statement": "La empresa ofrece tarjetas de regalo y empaque como parte de sus servicios.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 6,
+          "answer_words": 12,
+          "generation_elapsed_ms": 60950.75,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 6,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Se puede ver el diseño antes de pagar?",
+          "answer": "Sí, se puede ver el diseño previo a la impresión antes de realizar la compra.",
+          "knowledge_statement": "La empresa ofrece la opción de ver el diseño previo a la impresión.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 15,
+          "generation_elapsed_ms": 61346.33,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        },
+        {
+          "cluster_id": 7,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Cómo se incluye el texto en el diseño de las medias?",
+          "answer": "El texto se puede incluir en el diseño o como postal de regalo. Si se hace diseño, se incluye también las caras (6,4 cm x 21 cm). Si no se hace diseño, se suben solo las fotos de las caras y el mensaje se incluye como postal de regalo.",
+          "knowledge_statement": "El diseño de las medias incluye texto y caras, y el texto se puede incluir en el diseño o como postal de regalo.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 11,
+          "answer_words": 50,
+          "generation_elapsed_ms": 79704.63,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        },
+        {
+          "cluster_id": 8,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿En qué opción pongo la frase?",
+          "answer": "Ponla en la opción que indique el valor mínimo de domicilio gratuito.",
+          "knowledge_statement": "La frase se utiliza para indicar el valor mínimo de domicilio gratuito.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 6,
+          "answer_words": 12,
+          "generation_elapsed_ms": 60007.95,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 9,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Es posible cancelar un pedido?",
+          "answer": "Sí, es posible cancelar un pedido. Por favor, indique el número de su pedido para proceder con la cancelación.",
+          "knowledge_statement": "La intención principal del cluster es cancelar un pedido.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 5,
+          "answer_words": 19,
+          "generation_elapsed_ms": 62878.79,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_answer"
+          }
+        },
+        {
+          "cluster_id": 10,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Cómo se muestran las medias antes de imprimir?",
+          "answer": "La empresa muestra el resultado de las medias antes de imprimir, incluyendo el estampado y cualquier ajuste necesario.",
+          "knowledge_statement": "La empresa ofrece información sobre el resultado de las medias antes de imprimir.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 18,
+          "generation_elapsed_ms": 63484.53,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        },
+        {
+          "cluster_id": 11,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Qué colores de medias ofrece [persona]?",
+          "answer": "Ofrece medias en colores neutros como blanco, gris, cafecito y negro.",
+          "knowledge_statement": "La empresa ofrece medias en colores neutros como blanco, gris, cafecito y negro.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 6,
+          "answer_words": 11,
+          "generation_elapsed_ms": 64202.21,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 12,
+          "cluster_size": 3,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Cuáles son las schools de medias ofrecidas por [persona]?",
+          "answer": "Ofrece la old school y la peltre ola school.",
+          "knowledge_statement": "Ofrece diferentes schools de medias, incluyendo la old school y la peltre ola school.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 9,
+          "answer_words": 9,
+          "generation_elapsed_ms": 65834.19,
+          "validation": {
+            "accepted": false,
+            "reason": "rejected_invalid_canonical_question"
+          }
+        },
+        {
+          "cluster_id": 13,
+          "cluster_size": 4,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Se puede personalizar el rostro en medias y ropa interior?",
+          "answer": "Sí, se puede personalizar el rostro en medias y ropa interior. La empresa ofrece opciones de personalización para satisfacer diferentes necesidades.",
+          "knowledge_statement": "La empresa ofrece ropa interior para mujer y puede personalizar el rostro en medias y ropa interior.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 10,
+          "answer_words": 21,
+          "generation_elapsed_ms": 70618.05,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        },
+        {
+          "cluster_id": 14,
+          "cluster_size": 2,
+          "model": "Qwen/Qwen3-1.7B",
+          "question": "¿Qué colores de cuadros de uña están disponibles?",
+          "answer": "Los cuadros de uña disponibles son de color rosa y naranja.",
+          "knowledge_statement": "Los cuadros de uña disponibles son de color rosa y naranja.",
+          "publish": true,
+          "confidence": 0.85,
+          "valid_json": true,
+          "question_answer_aligned": true,
+          "alignment_reason": "",
+          "contains_thinking_text": false,
+          "question_words": 8,
+          "answer_words": 11,
+          "generation_elapsed_ms": 60665.59,
+          "validation": {
+            "accepted": true,
+            "reason": ""
+          }
+        }
+      ]
+    }
+  ]
+}
